@@ -1,0 +1,200 @@
+<!--
+ * @Description: 
+ * @Author: Hulk
+ * @Date: 2022-07-08 15:02:14
+ * @LastEditTime: 2022-07-14 19:00:45
+ * @LastEditors: Hulk
+ * @FilePath: 筹策/index.html
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+    .top {
+      display: flex;
+      justify-content: center;
+    }
+    #gua {
+      width: 200px;
+      margin-left: 50px;
+    }
+    .yao {
+      display: flex;
+      position: relative;
+    }
+    .yao-shu {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      left: -30px;
+      top: 0;
+    }
+    .yao-shu-bian {
+      color: red;
+    }
+    .yao + .yao {
+      margin-top: 10px;
+    }
+    .yao-item {
+      flex: 1;
+      height: 20px;
+      background: red;
+    }
+    .yao-item + .yao-item {
+      margin-left: 10px;
+    }
+    .btns {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .action {
+      width: 120px;
+      height: 45px;
+      line-height: 45px;
+      text-align: center;
+      color: #fff;
+      background: #000;
+    }
+    .desc {
+      text-align: center;
+      margin: 12px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top">
+    <div id="gua">
+      <div class="yao yao6"></div>
+      <div class="yao yao5"></div>
+      <div class="yao yao4"></div>
+      <div class="yao yao3"></div>
+      <div class="yao yao2"></div>
+      <div class="yao yao1"></div>
+    </div>
+  </div>
+  <div class="desc">无事不占</div>
+  <div class="btns">
+    <div class="action">起卦占筮</div>
+  </div>
+
+  <script>
+    let allList = new Array(50).fill(1);
+
+    function random(x,y) {
+      return Math.floor(y-Math.random()*(y-x))
+    }
+    function suan(list) {
+      // ☯️
+      list.pop();
+      let [arr, yao] = step(list);
+      [arr, yao] = step(arr);
+      [arr, yao] = step(arr);
+      return yao;
+    }
+
+    function step(list, index) {
+      console.log(list, 'all')
+      const rd = Math.random() > 0.5 ? random(list.length / 2, list.length / 2 + Math.ceil(Math.random() * 10)) : random(list.length / 2 - Math.ceil(Math.random() * 10), list.length / 2)
+      let yang = list.filter((_, i) => i < rd);
+      let yin = list.filter((_, i) => i >= rd);
+      yin.pop();
+      let newYang = yang.reduce((pre, cur, index) => {
+        if (!pre.length) {
+          pre.push(cur)
+          return pre;
+        }
+        let max = pre[pre.length -1];
+        if (max < 4) {
+          pre[pre.length -1] = pre[pre.length -1] + cur;
+        } else {
+          pre.push(cur);
+        }
+        return pre;
+      }, []);
+      let newYin = yin.reduce((pre, cur, index) => {
+        if (!pre.length) {
+          pre.push(cur)
+          return pre;
+        }
+        let max = pre[pre.length -1];
+        if (max < 4) {
+          pre[pre.length -1] = pre[pre.length -1] + cur;
+        } else {
+          pre.push(cur);
+        }
+        return pre;
+      }, []);
+      const yuYang = newYang.pop();
+      const yuYin = newYin.pop();
+      let len = [...newYang, ...newYin].reduce((pre, cur) => pre + cur, 0);
+      console.log('阳：', newYang, '余：', yuYang, '阴：', newYin, '余：', yuYin)
+      return [new Array(len).fill(1), newYang.length + newYin.length];
+    }
+
+    function renderGua(yao, index) {
+      if (yao % 2 === 0) {
+        let fragment = document.createDocumentFragment();
+        const div1 = document.createElement('div');
+        div1.classList.add('yao-item');
+        const div2 = document.createElement('div');
+        div2.classList.add('yao-item');
+        const yaoshu = document.createElement('div');
+        yaoshu.classList.add('yao-shu');
+        if ([6, 9].includes(yao)) {
+          yaoshu.classList.add('yao-shu-bian');
+        }
+        yaoshu.innerText = yao;
+        fragment.appendChild(div1);
+        fragment.appendChild(div2);
+        fragment.appendChild(yaoshu);
+        document.querySelector(`.yao${index}`).appendChild(fragment);
+      } else {
+        let fragment = document.createDocumentFragment();
+        const div1 = document.createElement('div');
+        div1.classList.add('yao-item');
+        const yaoshu = document.createElement('div');
+        yaoshu.classList.add('yao-shu');
+        if ([6, 9].includes(yao)) {
+          yaoshu.classList.add('yao-shu-bian');
+        }
+        yaoshu.innerText = yao;
+        fragment.appendChild(div1);
+        fragment.appendChild(yaoshu);
+        document.querySelector(`.yao${index}`).appendChild(fragment);
+      }
+    }
+
+    function renderCleanGua() {
+      allList = new Array(50).fill(1);
+      const yao = [...document.querySelectorAll('.yao')];
+      yao.forEach(item => {
+        item.innerHTML = '';
+      })
+    }
+
+    document.querySelector('.action').addEventListener('click', (e) => {
+      renderCleanGua();
+      const yao1 = suan(allList);
+      const yao2 = suan(allList);
+      const yao3 = suan(allList);
+      const yao4 = suan(allList);
+      const yao5 = suan(allList);
+      const yao6 = suan(allList);
+      const yaoList = [yao1, yao2, yao3, yao4, yao5, yao6];
+      yaoList.forEach((item, index) => {
+        renderGua(item, index + 1);
+      })
+    }, false);
+  </script>
+</body>
+</html>
