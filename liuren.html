@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>完整版小六壬占卜</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #8B4513;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            padding: 8px;
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #8B4513;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #A0522D;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 18px;
+            display: none;
+        }
+        .good {
+            background-color: #DFF0D8;
+            color: #3C763D;
+        }
+        .bad {
+            background-color: #F2DEDE;
+            color: #A94442;
+        }
+        .neutral {
+            background-color: #D9EDF7;
+            color: #31708F;
+        }
+        .hour-info {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>完整版小六壬占卜</h1>
+    
+    <div class="form-group">
+        <label for="month">农历月份 (1-12):</label>
+        <input type="number" id="month" min="1" max="12" value="1">
+    </div>
+    
+    <div class="form-group">
+        <label for="day">农历日期 (1-30):</label>
+        <input type="number" id="day" min="1" max="30" value="1">
+    </div>
+    
+    <div class="form-group">
+        <label for="hour">时辰:</label>
+        <select id="hour">
+            <option value="1">子时 (23:00-01:00)</option>
+            <option value="2">丑时 (01:00-03:00)</option>
+            <option value="3">寅时 (03:00-05:00)</option>
+            <option value="4">卯时 (05:00-07:00)</option>
+            <option value="5">辰时 (07:00-09:00)</option>
+            <option value="6">巳时 (09:00-11:00)</option>
+            <option value="7">午时 (11:00-13:00)</option>
+            <option value="8">未时 (13:00-15:00)</option>
+            <option value="9">申时 (15:00-17:00)</option>
+            <option value="10">酉时 (17:00-19:00)</option>
+            <option value="11">戌时 (19:00-21:00)</option>
+            <option value="12">亥时 (21:00-23:00)</option>
+        </select>
+    </div>
+    
+    <button onclick="calculate()">开始占卜</button>
+    
+    <div id="result"></div>
+    
+    <script>
+        // 宫位定义
+        const positions = [
+            { name: "大安", element: "木", meaning: "安稳、顺利、无灾无难", luck: "good" },
+            { name: "留连", element: "土", meaning: "拖延、反复、停滞不前", luck: "bad" },
+            { name: "速喜", element: "火", meaning: "快速、喜庆、好消息", luck: "good" },
+            { name: "赤口", element: "金", meaning: "口舌、是非、官非", luck: "bad" },
+            { name: "小吉", element: "水", meaning: "小顺利、贵人相助", luck: "good" },
+            { name: "空亡", element: "无", meaning: "落空、无果、虚惊", luck: "bad" },
+            { name: "病符", element: "土", meaning: "疾病、灾厄、健康问题", luck: "bad" },
+            { name: "桃花", element: "水", meaning: "感情、人际关系、异性缘", luck: "neutral" },
+            { name: "天德", element: "火", meaning: "天赐福报、贵人相助", luck: "good" }
+        ];
+        
+        function calculate() {
+            // 获取输入值
+            const month = parseInt(document.getElementById("month").value);
+            const day = parseInt(document.getElementById("day").value);
+            const hour = parseInt(document.getElementById("hour").value);
+            
+            // 验证输入
+            if (isNaN(month) || month < 1 || month > 12) {
+                alert("请输入有效的农历月份 (1-12)");
+                return;
+            }
+            if (isNaN(day) || day < 1 || day > 30) {
+                alert("请输入有效的农历日期 (1-30)");
+                return;
+            }
+            
+            // 计算宫位
+            // 第一步：月数决定起始位置
+            let startPos = (month - 1) % 9;
+            
+            // 第二步：日数决定移动步数
+            let dayPos = (startPos + day - 1) % 9;
+            
+            // 第三步：时辰数决定最终位置
+            let finalPos = (dayPos + hour - 1) % 9;
+            
+            // 获取结果
+            const result = positions[finalPos];
+            
+            // 显示结果
+            const resultDiv = document.getElementById("result");
+            resultDiv.innerHTML = `
+                <h2>占卜结果: ${result.name}</h2>
+                <p><strong>五行属性:</strong> ${result.element}</p>
+                <p><strong>吉凶:</strong> ${result.luck === "good" ? "吉" : result.luck === "bad" ? "凶" : "中平"}</p>
+                <p><strong>含义:</strong> ${result.meaning}</p>
+                <p><strong>推算路径:</strong> 月(${month}) → ${positions[startPos].name} → 日(${day}) → ${positions[dayPos].name} → 时(${hour}) → ${result.name}</p>
+            `;
+            
+            // 设置结果样式
+            resultDiv.className = "";
+            resultDiv.classList.add(result.luck);
+            resultDiv.style.display = "block";
+        }
+    </script>
+</body>
+</html>
